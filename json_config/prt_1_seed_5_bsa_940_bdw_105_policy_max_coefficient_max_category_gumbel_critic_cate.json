@@ -1,0 +1,14 @@
+{
+  "part": 1,
+  "seed": 5,
+  "base_station_computing_ability_eval_list": [
+    9400000000.0
+  ],
+  "bandwidth_eval_list": [
+    10500000.0
+  ],
+  "policy_back_propagation_approach": "max",
+  "coefficient_back_propagation_approach": "max",
+  "category_sample_method": "gumbel",
+  "critic_index_calculation": "cate"
+}
