@@ -8,7 +8,7 @@ class Task:
         self.task_from_mobile_device_id = mobile_device_id
 
         self.task_data_size = np.random.normal(self.task_config.task_data_size_now,
-                                               self.task_config.task_date_size_std)  # 当前生成任务的总数据量
+                                               self.task_config.task_date_size_std)
         self.task_data_size = np.where(self.task_data_size < 50, 50, self.task_data_size)
         self.task_data_size_max = self.task_config.task_data_size_max
         # self.task_current_data_size_in_queue = self.task_data_size
@@ -24,12 +24,6 @@ class Task:
 
         self.step_count_begin = -1
         self.task_switch_time_list_on_base_station = 0
-        # print("__init__task_size:", self.task_data_size)
-        # print("__init__task_tolerance_delay:", self.task_tolerance_delay)
-        # print("__init__task_from_mobile_device_id:", self.task_from_mobile_device_id)
 
     def get_task_info_list(self):
-        # print("__function__task_size:", self.task_data_size)
-        # print("__function__task_tolerance_delay:", self.task_tolerance_delay)
-        # print("__function__task_from_mobile_device_id:", self.task_from_mobile_device_id)
         return [self.task_data_size, self.task_tolerance_delay]

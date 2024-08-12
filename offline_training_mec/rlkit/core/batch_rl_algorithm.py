@@ -108,40 +108,11 @@ class BatchRLAlgorithm(BaseRLAlgorithm, metaclass=abc.ABCMeta):
         means = new_paths[0]['means']
         stds = new_paths[0]['stds']
         actions = new_paths[0]['actions']
-        # means_all = (new_paths[0]['means_all']).reshape(path_length, primative_num, goal_dim * ue_num)
-        # stds_all = (new_paths[0]['stds_all']).reshape(path_length, primative_num, goal_dim * ue_num)
-        # indexs = new_paths[0]['indexs']
         data_transmission_rate = new_paths[0]['data_transmission_rate_all'].reshape(path_length, ue_num, -1)
 
         for i in range(path_length):
             means[i][1] = (means[i][1] + 1) / 2
             means[i][3] = (means[i][3] + 1) / 2
-            # self.viz.bar(X=observations[i][:, 0], win=title + '-task_data_size',
-            #              opts=dict(title=title + "-task_data_size"))
-            # self.viz.bar(X=observations[i][:, 3], win=title + '-energy_now', opts=dict(title=title + "-energy_now"))
-            # self.viz.bar(X=observations[i][:, 6], win=title + '-user_equipment_queue_time_now',
-            #              opts=dict(title=title + "-user_equipment_queue_time_now"))
-            # self.viz.bar(X=observations[i][:, 8], win=title + '-base_station_queue_time_now',
-            #              opts=dict(title=title + "-base_station_queue_time_now"))
-            # self.viz.bar(X=means[i].reshape(-1, 2), win=title + '-mean', opts=dict(title=title + "-mean"))
-            # self.viz.bar(X=stds[i].reshape(-1, 2), win=title + '-std', opts=dict(title=title + "-std"))
-            # self.viz.bar(X=actions[i].reshape(-1, 2), win=title + '-action', opts=dict(title=title + "-action"))
-            # self.viz.bar(X=data_transmission_rate[i], win=title + '-data_transmission_rate',
-            #              opts=dict(title=title + "-data_transmission_rate"))
-            # self.viz.bar(X=actions[i], win=title+'-p', opts=dict(title=title+"-action"))
-            # self.viz.text("选择原语的编号："+str(indexs[i]), win=title+'-index', opts=dict(title=title+"_index"))
-            # for j in range(means_all.shape[1]):
-            #         mean_title = title+"-mean-p" + str(j)
-            #         std_title = title+"-std-p" + str(j)
-            #         means_all[i][j][1] = (means_all[i][j][1] + 1) / 2
-            #         means_all[i][j][3] = (means_all[i][j][1] + 1) / 2
-            #         self.viz.bar(X=means_all[i][j], win=mean_title, opts=dict(title=mean_title))
-            #         self.viz.bar(X=stds_all[i][j], win=std_title, opts=dict(title=std_title))
-            # time.sleep(0.05)
-        # self.viz.line(X=np.array([epoch]), Y=np.array([np.mean(new_paths[0]['rewards'])]), win=title + "_reward",
-        #               update="append", opts=dict(title=title + "_reward"))
-        # self.viz.line(X=np.array([epoch]), Y=np.array([np.mean(new_paths[0]['cost_avg_list'])]), win=title + "_cost",
-        #               update="append", opts=dict(title=title + "_cost"))
 
     def _train(self):
         network_name = ['policy', 'qf1', 'qf2', 'target_qf1', 'target_qf2']
@@ -177,11 +148,6 @@ class BatchRLAlgorithm(BaseRLAlgorithm, metaclass=abc.ABCMeta):
                 self.num_eval_steps_per_epoch,
                 discard_incomplete_paths=True,
             )
-            # self.visualization(epoch, new_eval_paths, title="eval")
-            # print("new_eval_paths[0]['path_length']:", new_eval_paths[0]['path_length'])
-            # print("np.mean(new_eval_paths[0]['data_transmission_rate_all']:", new_eval_paths[0]['data_transmission_rate_all'])
-            # print("np.mean(new_eval_paths[0]['data_transmission_rate_all']:", np.mean(new_eval_paths[0]['data_transmission_rate_all']))
-            # exit()
             self.writer.add_scalar("episode_reward_message/path_length_eval", np.mean(new_eval_paths[0]['path_length']),
                                    epoch)
             self.writer.add_scalar("episode_reward_message/offload_num_eval",
@@ -216,19 +182,11 @@ class BatchRLAlgorithm(BaseRLAlgorithm, metaclass=abc.ABCMeta):
                 dict_one_episode_raplay_buffer["actions"] = new_expl_paths[0]["actions"]
                 dict_one_episode_raplay_buffer["next_observations"] = new_expl_paths[0]["next_observations"]
                 dict_one_episode_raplay_buffer["rewards"] = new_expl_paths[0]["rewards"]
-                # print("dict_one_episode_raplay_buffer:", dict_one_episode_raplay_buffer["rewards"])
-                # if dict_one_episode_raplay_buffer["rewards"].shape[0] > 2:
-                #     exit()
                 dict_one_episode_raplay_buffer["terminals"] = new_expl_paths[0]["terminals"]
                 if self._global_config.train_config.algorithm != 'PMOE':
                     np.save(os.path.join(self.buffer_npy_path, str(epoch) + '.npy'), dict_one_episode_raplay_buffer)
-                # self.visualization(epoch, new_expl_paths, title="expl")
-                # gt.stamp('exploration sampling', unique=False)
 
-                # print('index:', new_expl_paths[0]['indexs'])
-                # print('index:', new_expl_paths[0]['rewards'])
                 self.replay_buffer.add_paths(new_expl_paths)
-                # gt.stamp('data storing', unique=False)
 
                 self.training_mode(True)
                 if self.is_eval_model:
@@ -262,5 +220,3 @@ class BatchRLAlgorithm(BaseRLAlgorithm, metaclass=abc.ABCMeta):
                 self.training_mode(False)
 
             self._end_epoch(epoch)
-            # if epoch == 2:
-            #     exit()

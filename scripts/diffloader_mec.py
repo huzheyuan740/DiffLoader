@@ -47,7 +47,6 @@ def get_prompt_file(global_config, task_list):
 
             dest_dir = os.path.join(prompt_npy_path, 'seed_' + str(seed), task_item, str(episode_item) + '.npy')
             os.makedirs(os.path.dirname(dest_dir), exist_ok=True)
-            # os.chmod(os.path.dirname(dest_dir), 0o754)
             command = f'cp {src_dir} {dest_dir}'
             os.system(command)
             # shutil.copy(src_dir, os.path.dirname(dest_dir))
@@ -57,20 +56,13 @@ def language_embedding(language_prompt_list):
     language_prompt_value_list = []
     max_len = 128
     for language_prompt in language_prompt_list:
-        # print("language_prompt:", language_prompt)
-        # print("len:", len(language_prompt.split()))
         tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
         model = BertModel.from_pretrained("bert-base-uncased")
         encoded_input = tokenizer(language_prompt, padding=True, truncation=True, max_length=max_len,  return_tensors='pt')
 
-        # print("Token IDs:", encoded_input['input_ids'].shape)
-        # tokens = tokenizer.convert_ids_to_tokens(encoded_input['input_ids'][0])
-        # print("Tokens:", tokens)
-
         output = model(**encoded_input)
         language_prompt_value = output.last_hidden_state[:, 0, :].tolist()
         language_prompt_value_list.append(language_prompt_value)
-        # print("language:", np.mean(np.array(language_prompt_value)))
     language_prompt_value_list = np.array(language_prompt_value_list)
     return language_prompt_value_list
 
@@ -103,7 +95,7 @@ def get_prompt_trajectories(global_config, task_list, test_env_list):
         index = task_item.find(query_str)
         env_par = task_item[index + len(query_str):]
         env_slice = env_par.split('_')
-        language_prompt_eval = f'Current MEC system has the bandwidth of {env_slice[0]} MHz, the computational capability is {env_slice[1]} GHz, and the task size is about {env_slice[2]} kb.'
+        language_prompt_eval = f'The bandwidth of {env_slice[0]} MHz, the computational power of ES is {env_slice[1]} GHz, and the task size of UEs is around {env_slice[2]} Kb.'
         language_prompt_list.append(language_prompt_eval)
         each_task_list = []
         prompt_file_list = os.listdir(os.path.join(prompt_npy_path, 'eval', task_item))
@@ -126,12 +118,11 @@ torch.cuda.manual_seed_all(args_seed)
 torch.manual_seed(args_seed)
 np.random.seed(args_seed)
 random.seed(args_seed)
-print("args:\n", args)
 task_list = []
 if global_config.train_config.save_buffer_npy_path is not None:
     # task_list = ['basketball-v2', 'bin-picking-v2']
     task_list_all = os.listdir(
-        os.path.join(global_config.train_config.save_buffer_npy_path, 'seed_' + str(args_seed)))  # TODO 这里之后要删掉
+        os.path.join(global_config.train_config.save_buffer_npy_path, 'seed_' + str(args_seed)))
     test_env_list = global_config.train_config.test_env_list
     task_list = [x for x in task_list_all if x not in test_env_list]
 
@@ -147,7 +138,8 @@ if global_config.train_config.save_prompt_npy_path is not None and global_config
 test_env_list = global_config.train_config.test_env_list
 print("task_list:", task_list)
 prompt_trajectories, language_prompt_list = get_prompt_trajectories(global_config, task_list, test_env_list)
-language_prompt_list = language_embedding(language_prompt_list)
+if global_config.train_config.prompt_type == 'language':
+    language_prompt_list = language_embedding(language_prompt_list)
 
 dataset_config = utils.Config(
     args.loader,

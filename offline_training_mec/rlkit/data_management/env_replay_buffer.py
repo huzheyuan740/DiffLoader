@@ -2,7 +2,6 @@ import numpy as np
 from gym.spaces import Discrete
 
 from offline_training_mec.rlkit.data_management.simple_replay_buffer import SimpleReplayBuffer
-from offline_training_mec.rlkit.envs.env_utils import get_dim
 
 
 class EnvReplayBuffer(SimpleReplayBuffer):

@@ -107,7 +107,7 @@ class EnvWorker(mp.Process):
 
 				next_obs = []
 				for mobile_device_id in range(len(self.env.base_station_set.all_mobile_device_list)):
-					each_state = self.env.get_state_per_mobile_device(mobile_device_id)  # 只有调用这个方法才能得到state对象
+					each_state = self.env.get_state_per_mobile_device(mobile_device_id)
 					state_array = each_state.get_normalized_state_array()
 					next_obs.append(state_array)
 				next_state = np.concatenate(next_obs, -1)

@@ -115,12 +115,9 @@ class MobileDeviceConfig:
         self.queue_time = 0.0
         self.transmitting_time_to_base_station_max = 1.5
         self.distance_to_base_station_max = 80
-        self.transmitting_power = 0.1  # 单位:W
-        # 能量目前暂时用不到d
+        self.transmitting_power = 0.1  # Unit:W
         self.energy_coefficient = 10 ** (-27)
         self.user_equipment_energy = (10 ** -27) * ((1 * 1024*1024*1024) ** 2) * 1000 * 1024 * 1000 * 21
-        # print("energy:", self.user_equipment_energy)
-        # exit()
         self.task_queue_size_max = 100
 
 
@@ -148,7 +145,6 @@ class CostConfig:
 
 class RewardConfig:
     def __init__(self):
-        # self.penalty_over_time = -1000
         self.cost_to_reward = -10
         self.init_reward = 0  #
         self.mean_reward = self.init_reward

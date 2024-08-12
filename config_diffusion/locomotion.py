@@ -34,7 +34,7 @@ base = {
         'is_unet': False,
         'attention': True,
         'renderer': 'utils.MuJoCoRenderer',
-        'replay_dir_metaworld': './collect/metaworld',
+        'replay_dir_metaworld': None,
         'loader': 'datasets.MTValueDataset',
         #'normalizer': 'GaussianNormalizer',#SafeLimitsNormalizer
         'normalizer': 'SafeLimitsNormalizer',
@@ -48,9 +48,8 @@ base = {
         'termination_penalty': -0,
         'normed': True,
         #multi-task dataset
-        'dataset_dir':'./collect/walker/dataset',
-        'task_list':['walker_run','walker_walk','walker_flip','walker_stand'],
-            #['quadruped_walk', 'quadruped_jump','quadruped_run','quadruped_roll_fast'],
+        'dataset_dir': None,
+        'task_list':None,
         'data_type_list':['replay','replay','replay','replay'],
         ## serialization
         'logbase': logbase,
@@ -74,7 +73,7 @@ base = {
         'bucket': None,
         'device': 'cuda:0',
         'seed': None,
-        'inv_task': 'pick-place-v2'
+        'inv_task': None
     },
 
 

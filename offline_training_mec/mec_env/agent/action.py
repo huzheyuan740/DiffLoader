@@ -13,13 +13,11 @@ class Action:
         self.action_config = global_config.agent_config.action_config
 
     def get_action_list(self):
-        return [self.offload_choice_idx,
-                ]  # self.offload_task_percentage
+        return [self.offload_choice_idx,]
 
     def get_action_array(self):
         import numpy as np
-        return np.array([self.offload_choice_idx,
-                         ])  # self.offload_task_percentage
+        return np.array([self.offload_choice_idx,])
 
     def get_whether_offload(self):
         if self.offload_choice_idx > self.action_config.threshold_to_offload:

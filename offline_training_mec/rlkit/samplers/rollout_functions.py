@@ -127,13 +127,6 @@ def rollout(
     o = []
     state_class_list = []
     goals_list = []
-    # for ue_id in range(env.ue_num):
-    #     ue_state = env.get_state_per_mobile_device(ue_id)
-    #     state_class_list.append(ue_state)
-    #     # goals_list.extend(ue_state.goals)
-    #     o.extend(ue_state.get_state_list())
-    # o = np.array(o)
-    # g = np.array(goals_list)
     ue_queue_time_now = np.zeros(env.ue_num)
 
     agent.reset()
@@ -157,7 +150,6 @@ def rollout(
             o_human.extend(ue_state.get_state_list())
             o.extend(ue_state.get_normalized_state_array())
             goals_list.extend(ue_state.goals)
-        # print("o:", o)
         o = np.array(o)
         g, a, a_all, mean, mean_all, log_std, log_prob, mixing_coefficient, entropy, std, std_all, mean_action_log_prob, pre_tanh_value, index, agent_info = \
             None, None, None, None, None, None, None, None, None, None, None, None, None, None, None
@@ -174,16 +166,7 @@ def rollout(
         action_offload_mask = action_offload_mask[:, 0]
         action_class_list = []
         for ue_id, action in enumerate(a_reshaped):
-            # partial_offloading = action[0]
-            # transmit_power = (action[1] + 1) / 2
-            # print("partial_offloading:", partial_offloading)
-            # if env.global_config.train_config.is_testbed:
-            #     ue_action = Action([partial_offloading], env.global_config)
-            # else:
-            #     wireless_channel = action[1]
-            #     ue_action = Action([partial_offloading, wireless_channel], env.global_config)
             ue_action = Action(action, env.global_config)
-            # print("partial_offloading:{}, transmit_power:{}".format(partial_offloading, transmit_power))
             action_class_list.append(ue_action)
 
         # init some list to save data before run one step
@@ -197,7 +180,6 @@ def rollout(
         data_transmission_rate_list = np.ones(env.ue_num)
         offload_count = 0
         for ue_id in range(env.ue_num):
-            # ue_queue_time_now[ue_id] = state_class_list[ue_id].user_equipment_queue_time_now
             if action_class_list[ue_id].get_whether_offload():
                 offload_count += 1
 
@@ -213,14 +195,12 @@ def rollout(
         next_obs = []
         next_obs_human = []
         for mobile_device_id in range(len(env.base_station_set.all_mobile_device_list)):
-            each_state = env.get_state_per_mobile_device(mobile_device_id)  # 只有调用这个方法才能得到state对象
+            each_state = env.get_state_per_mobile_device(mobile_device_id)
             state_array = each_state.get_normalized_state_array()
             next_goal_list.extend(each_state.goals)
             next_obs.append(state_array)
             next_obs_human.extend(each_state.get_state_list())
         next_state = np.concatenate(next_obs, -1)
-        # print("next_obs:", next_obs)
-        # print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         done = any(done_list)
         terminal = False
         terminal = (path_length + 1 >= max_path_length)
@@ -230,13 +210,6 @@ def rollout(
         episode_cost_list.append(cost_array[0])
         episode_cost_max_list.append(cost_array_max[0])
         eposide_reward_list.append(reward)
-
-        # cost_avg = np.mean(ue_cost_list)
-        # cost_baseline_avg = np.mean(local_cost_baseline_list)
-        # reward += (cost_baseline_avg - cost_avg) * 500
-        # print(
-        #     "cost:{}, baseline:{}, origin_r:{} reward:{}".format(
-        #         cost_avg, cost_baseline_avg, temp_reward, reward))
 
         next_o, next_g, r, d, env_info = next_state, np.array(next_goal_list), reward, done, {}
         observations.append(o)
@@ -274,7 +247,6 @@ def rollout(
         if render:
             env.render(**render_kwargs)
 
-    # print('path_length:', path_length)
     actions = np.array(actions)
     if len(actions.shape) == 1:
         actions = np.expand_dims(actions, 1)
@@ -323,11 +295,6 @@ def rollout(
     indexs = np.array(indexs)
     if len(indexs.shape) == 1:
         indexs = np.expand_dims(indexs, 1)
-    # print("observations:", observations.shape)
-    # print("actions:", actions.shape)
-    # print("next_observations:", next_observations.shape)
-    # print("np.array(rewards):", np.array(rewards).reshape(-1, 1))
-    # print("np.array(terminals):", np.array(terminals).reshape(-1, 1).shape)
     return dict(
         observations=observations,
         goals_all=goals_all,

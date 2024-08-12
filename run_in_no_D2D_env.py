@@ -106,7 +106,7 @@ class AgentOperator:
         state_class_list = []
         obs = []
         for mobile_device_id in range(self.ue_num):
-            each_state = self.env_manager.get_state_per_mobile_device(mobile_device_id)  # 只有调用这个方法才能得到state对象
+            each_state = self.env_manager.get_state_per_mobile_device(mobile_device_id)
             state_class_list.append(each_state)
             state_list = each_state.get_state_list()
             state_array = each_state.get_normalized_state_array()

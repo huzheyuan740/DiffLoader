@@ -39,9 +39,7 @@ def default_sample_fn(model, x, cond, task, value,  context_mask, t, **sample_kw
 
     # no noise when t == 0
     noise = 0.5*torch.randn_like(x)
-    nonzero_mask = (1 - (t == 0).float()).reshape(b, *((1,) * (len(x.shape) - 1))) #TODO:add nonzero_mask
-    #noise = model_mean + nonzero_mask * (0.5 * model_log_variance).exp() * noise
-    #noise[t == 0] = 0
+    nonzero_mask = (1 - (t == 0).float()).reshape(b, *((1,) * (len(x.shape) - 1)))
 
     values = torch.zeros(len(x), device=x.device)
     return model_mean + nonzero_mask * (0.5 * model_log_variance).exp() * noise, values
@@ -113,7 +111,6 @@ class GaussianDiffusion(nn.Module):
             (1. - alphas_cumprod_prev) * np.sqrt(alphas) / (1. - alphas_cumprod))
 
         ## get loss coefficients and initialize objective
-        #print(loss_weights)
         loss_weights = self.get_loss_weights(action_weight, loss_discount, loss_weights)
         self.loss_fn = Losses[loss_type](loss_weights, self.act_rew_dim)
         ##loss_weights = self.get_loss_weights(loss_discount)
@@ -329,15 +326,6 @@ class GaussianInvDiffusion(nn.Module):
         self.register_buffer('posterior_mean_coef2',
             (1. - alphas_cumprod_prev) * np.sqrt(alphas) / (1. - alphas_cumprod))
 
-        ## get loss coefficients and initialize objective
-        #print(loss_weights)
-        ##loss_weights = self.get_loss_weights(action_weight, loss_discount, loss_weights)
-        ##self.loss_fn = Losses[loss_type](loss_weights, self.act_rew_dim)
-        #loss_weights = self.get_loss_weights(loss_discount)
-        #self.loss_fn = Losses[loss_type](loss_weights)
-        #self.action_weight = action_weight
-        #self.inv_model = ARInvModel(hidden_dim=256, observation_dim=self.observation_dim, action_dim=self.action_dim)
-
     def get_loss_weights(self, discount):
         '''
             sets loss coefficients for trajectory
@@ -419,7 +407,6 @@ class GaussianInvDiffusion(nn.Module):
         values = None
         progress = utils.Progress(self.n_timesteps) if verbose else utils.Silent()  # self.n_timesteps: 200
         begin_diffusion_time = time.time()
-        print("value:", value)
         for i in reversed(range(0, self.n_timesteps)):
             t = make_timesteps(batch_size, i, device)
             x, values = sample_fn(self, x, cond, task, value, context_mask, t, **sample_kwargs)

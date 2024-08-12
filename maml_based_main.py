@@ -1,5 +1,4 @@
 import maml_rl.envs
-import gym
 import numpy as np
 import torch
 import json
@@ -10,15 +9,10 @@ from maml_rl.baseline import LinearFeatureBaseline
 from maml_rl.sampler import BatchSampler
 from config import GlobalConfig
 
-# from tensorboardX import SummaryWriter
 from torch.utils.tensorboard import SummaryWriter
 
 
 def total_rewards(episodes_rewards, aggregation=torch.mean):
-	# print("episodes_rewards:", episodes_rewards)
-	# print("xx:", torch.stack([aggregation(torch.sum(rewards, dim=0))
-	#                                   for rewards in episodes_rewards], dim=0))
-	# exit()
 	rewards = torch.mean(torch.stack([aggregation(torch.sum(rewards, dim=0))
 	                                  for rewards in episodes_rewards], dim=0))
 	return rewards.item()
@@ -28,10 +22,6 @@ def main(args):
 
 	args.output_folder = args.env_name
 	global_config = GlobalConfig()
-
-	# continuous_actions = (args.env_name in ['AntVel-v1', 'AntDir-v1',
-	#                                         'AntPos-v0', 'HalfCheetahVel-v1', 'HalfCheetahDir-v1',
-	#                                         '2DNavigation-v0'])
 
 	continuous_actions = True
 
@@ -67,14 +57,12 @@ def main(args):
 
 	for batch in range(args.num_batches): # number of epoches
 
-		tasks = sampler.sample_tasks(num_tasks=args.meta_batch_size, global_config=global_config)  # 采集出不同方向的任务
+		tasks = sampler.sample_tasks(num_tasks=args.meta_batch_size, global_config=global_config)
 		episodes = metalearner.sample(tasks, first_order=args.first_order, writer=writer, current_batch=batch)
-		print("1?")
 
 		metalearner.step(episodes, max_kl=args.max_kl, cg_iters=args.cg_iters,
 		                 cg_damping=args.cg_damping, ls_max_steps=args.ls_max_steps,
 		                 ls_backtrack_ratio=args.ls_backtrack_ratio)
-		print("2?")
 
 		# Tensorboard
 		writer.add_scalar('total_rewards/before_update',

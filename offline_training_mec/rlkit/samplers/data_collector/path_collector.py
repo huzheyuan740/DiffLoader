@@ -46,26 +46,6 @@ class MdpPathCollector(PathCollector):
         paths = []
         num_steps_collected = 0
         count = 0
-        # while num_steps_collected < num_steps:
-        #     count += 1
-        #     max_path_length_this_loop = min(  # Do not go over num_steps
-        #         max_path_length,
-        #         num_steps - num_steps_collected,
-        #     )
-        #     path = rollout(
-        #         self._env,
-        #         self._policy,
-        #         max_path_length=max_path_length_this_loop,
-        #     )
-        #     path_len = len(path['actions'])
-        #     if (
-        #             path_len != max_path_length
-        #             and not path['terminals'][-1]
-        #             and discard_incomplete_paths
-        #     ):
-        #         break
-        #     num_steps_collected += path_len
-        #     paths.append(path)
         count += 1
         max_path_length_this_loop = min(  # Do not go over num_steps
             max_path_length,
@@ -174,7 +154,7 @@ class MdpPathCollector(PathCollector):
         #     always_show_all_stats=True,
         # ))
         # print("x:", self._epoch_paths)
-        path_length = self._epoch_paths[0]['path_length']  # TODO
+        path_length = self._epoch_paths[0]['path_length']
         obs_normalized = self._epoch_paths[0]['observations']
         obs_restored = self.restore_observations(obs_normalized)
 
@@ -189,18 +169,12 @@ class MdpPathCollector(PathCollector):
         mixing_coefficients = self._epoch_paths[0]['mixing_coefficients']
         act_all_normalized = self._epoch_paths[0]['actions_all']
         indexs = self._epoch_paths[0]['indexs']
-        # print("indexs:", indexs.shape)
-        # print("path_length:", path_length)
-        # print("act_normalized:", act_restored.shape)
-        # print("act_all_normalized:", act_all_normalized.shape)
-        # print("mixing_coefficients:", mixing_coefficients)
         act_all_restored = np.array([])
         for primitive_idx in range(act_all_normalized.shape[2]):
             each_act = act_all_normalized[:, 0, primitive_idx, :]
             each_act_restored = self.restore_actions(each_act)
             act_all_restored = np.append(act_all_restored, each_act_restored)
         act_all_restored = act_all_normalized.reshape(act_normalized.shape[0], act_all_normalized.shape[2], -1)
-        # print("act_all_restored:", act_all_restored.shape)
 
         ue_num = self._base_station_set_config.user_equipment_num
         stats = OrderedDict([

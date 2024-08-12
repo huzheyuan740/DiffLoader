@@ -52,7 +52,7 @@ def get_prompt(trajectories, num_episodes, num_steps, is_meta, is_maze=False):
                           for i in range(num_episodes)])
     p_trj_actions = np.array([trajectories[trj_ids[i]]['actions'][start_steps[i]:start_steps[i] + num_steps]
                               for i in range(num_episodes)])
-    p_trj = np.concatenate([p_trj_obs, p_trj_actions], axis=-1).reshape(num_episodes * num_steps, -1)  # TODO
+    p_trj = np.concatenate([p_trj_obs, p_trj_actions], axis=-1).reshape(num_episodes * num_steps, -1)
     # p_trj.shape:(5, 200) step * (obs_dim+action_dim)
     return p_trj
 
@@ -87,21 +87,18 @@ def get_prompt_for_language(trajectories, num_episodes, num_steps, is_meta, is_m
                           for i in range(num_episodes)])
     p_trj_actions = np.array([trajectories[trj_ids[i]]['actions'][start_steps[i]:start_steps[i] + num_steps]
                               for i in range(num_episodes)])
-    p_trj = np.concatenate([p_trj_obs, p_trj_actions], axis=-1).reshape(num_episodes * num_steps, -1)  # TODO
-    print("n:", p_trj.shape)
+    p_trj = np.concatenate([p_trj_obs, p_trj_actions], axis=-1).reshape(num_episodes * num_steps, -1)
     return p_trj
 
 
 def index_to_onehot(index, size):
-    # 创建一个全为0的向量，长度为size
     onehot = np.zeros(size, dtype=int)
-    # 在索引位置设置为1
     onehot[index] = 1
     return onehot
 
 
 def get_prompt_for_one_hot(trajectories, ind, num_episodes, num_steps, is_meta, is_maze=False):
-    onehot_vector = index_to_onehot(ind, 200)  # 在这里设置编码后one-hot的维度为200
+    onehot_vector = index_to_onehot(ind, 200)
     return onehot_vector
 
 
@@ -120,9 +117,6 @@ def get_prompt_batchs(prompt_trajectories, cond, prompt_type=None, num_episodes=
                         in cond]
     elif prompt_type == 'normal':
         trajectories = [get_prompt(prompt_trajectories[ind], num_episodes, num_steps, is_meta) for ind in cond]
-    # print("len:", len(trajectories))
-    # for tra in trajectories:
-    #     print("xx:", tra.shape)
     return torch.tensor(np.array(trajectories))
 
 

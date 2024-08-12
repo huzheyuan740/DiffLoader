@@ -206,7 +206,7 @@ class MetaworldTrainer(object):
             state_class_list_each_env = []
             env_for_run.create_task_per_step()
             for mobile_device_id in range(len(env_for_run.base_station_set.all_mobile_device_list)):
-                each_state = env_for_run.get_state_per_mobile_device(mobile_device_id)  # 只有调用这个方法才能得到state对象
+                each_state = env_for_run.get_state_per_mobile_device(mobile_device_id)
                 state_class_list_each_env.append(each_state)
                 state_array = each_state.get_normalized_state_array()
                 obs_list_each_env.extend(state_array)
@@ -236,14 +236,6 @@ class MetaworldTrainer(object):
         cond_task += len(self.task_list)
         conditions = torch.zeros([obs.shape[0], 2, obs.shape[-1]], device=device)
         rtg = torch.ones((len(env_list),), device=device) * 6
-        # cond_task: tensor([0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
-        #                   device='cuda:0')
-        # rtg: tensor([9., 9., 9., 9., 9., 9., 9., 9., 9., 9., 9., 9., 9., 9., 9., 9., 9., 9.,
-        #              9., 9.], device='cuda:0')
-
-        # print("cond_task:", cond_task)
-        # print("rtg:", rtg)
-        # print("self.horizon:", self.horizon)
         episode_reward = np.zeros((len(env_for_run_list)))
         episode_cost_list = np.zeros((max_episode_length, len(env_for_run_list)))
         episode_cost_max_list = np.zeros((max_episode_length, len(env_for_run_list)))
@@ -270,14 +262,8 @@ class MetaworldTrainer(object):
                 action_class_list = []
                 a_reshaped = a_reshaped.reshape(-1, self.global_config.agent_config.action_config.dimension)
                 for ue_id, each_action_reshaped in enumerate(a_reshaped):
-                    # partial_offloading = action
-                    # transmit_power = (action[1] + 1) / 2
-                    # print("partial_offloading:", partial_offloading)
-                    # ue_action = Action([partial_offloading], self.global_config)
-                    # print("partial_offloading:{}, transmit_power:{}".format(partial_offloading, transmit_power))
                     ue_action = Action(each_action_reshaped, self.global_config)
                     action_class_list.append(ue_action)
-                # next_observation, reward, _, terminal, info = env_for_run_list[i].step(action[i])
                 next_state_class_list, cost_array, reward_array, cost_array_max, done_list, _ \
                     = env_for_run_list[i].step(state_class_list[i], action_class_list, j)
                 reward = reward_array[0]
@@ -286,7 +272,7 @@ class MetaworldTrainer(object):
                 next_obs = []
                 for mobile_device_id in range(len(env_for_run_list[i].base_station_set.all_mobile_device_list)):
                     each_state = env_for_run_list[i].get_state_per_mobile_device(
-                        mobile_device_id)  # 只有调用这个方法才能得到state对象
+                        mobile_device_id)
                     state_array = each_state.get_normalized_state_array()
                     next_obs.append(state_array)
                 next_state = np.concatenate(next_obs, -1)
@@ -304,23 +290,8 @@ class MetaworldTrainer(object):
                 if done:
                     break
 
-                # obs_list.append(next_observation[None])
-                # episode_rewards[i] += reward
-                # if info['success'] > 1e-8:
-                #     env_success_rate[i] = 1
-            # obs = np.concatenate(obs_list, axis=0)
         for i in range(len(env_for_run_list)):
-            # tmp = []
-            # tmp_suc = 0
-            # for j in range(num_eval):
-            #     tmp.append(episode_rewards[i + j * len(self.envs)])
-            #     tmp_suc += env_success_rate[i + j * len(self.envs)]
-            # this_score = statistics.mean(tmp)
-            # success = tmp_suc / num_eval
-            # total_success += success
-            # score += this_score
             print(f"task:{i},reward:{episode_reward[i]}, cost:{np.mean(episode_cost_list[:, i])},")
-        # print('Total success rate:', total_success / len(env_for_run_list))
         return np.mean(episode_rewards), np.mean(episode_cost_list)
 
     def save(self, epoch):

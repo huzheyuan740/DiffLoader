@@ -2,7 +2,6 @@
 
 import offline_training_mec.rlkit.torch.pytorch_util as ptu
 from offline_training_mec.rlkit.data_management.env_replay_buffer import EnvReplayBuffer
-from offline_training_mec.rlkit.envs.wrappers import NormalizedBoxEnv
 from offline_training_mec.rlkit.launchers.launcher_util import setup_logger
 from offline_training_mec.rlkit.samplers.data_collector import MdpPathCollector
 from offline_training_mec.rlkit.torch.networks import FlattenMlp
@@ -23,7 +22,7 @@ def experiment(variant, global_config):
     state_class_list = []
     obs = []
     for mobile_device_id in range(len(env.base_station_set.all_mobile_device_list)):
-        each_state = env.get_state_per_mobile_device(mobile_device_id)  # 只有调用这个方法才能得到state对象
+        each_state = env.get_state_per_mobile_device(mobile_device_id)
         state_class_list.append(each_state)
         state_list = each_state.get_state_list()
         state_array = each_state.get_normalized_state_array()

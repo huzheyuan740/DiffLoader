@@ -13,7 +13,7 @@ class State:
         self.base_station_list = base_station_set.base_station_list
         self.mobile_device_computing_ability = mobile_device.computing_ability_now  # for BS_com_ability_list
         self.mobile_device_list = base_station_set.all_mobile_device_list  # for other task size and mask
-        self.task_data_size = mobile_device.task.task_data_size  # 不知道这里之后有没有是否能读到当前任务量值的问题
+        self.task_data_size = mobile_device.task.task_data_size
         self.task_tolerance_delay = mobile_device.task.task_tolerance_delay
         self.task_info = mobile_device.task
         self.task_data_index_list = base_station_set.base_station_set_config.task_config.task_data_index_list
@@ -30,15 +30,10 @@ class State:
         self.base_station_task_queue_size_max_list = [base_station.task_queue_size_max for base_station
                                                       in self.base_station_list]
 
-        # 以下为实际state的各个属性
         self.base_station_set_computing_ability_list = self.get_base_station_set_computing_ability_list(
             self.base_station_list)
-        # self.mobile_device_computing_ability self.task_data_size self.task_tolerance_delay上面已定义
-        # self.all_task_size_list, self.task_size_mask_list = self.get_other_task_size(self.mobile_device_list,
-        #                                                                              self.mobile_device_id)
         self.all_task_size_list = self.get_task_size(self.mobile_device_list,
                                                            self.mobile_device_id)
-        # print("self.all_task_size_list:", self.all_task_size_list)
         if self.global_config.train_config.is_testbed:
             self.transmitting_time_to_all_base_station_list = [
                 self.all_task_size_list[0] / 1024 / self.data_transmitting_rate]
@@ -66,7 +61,6 @@ class State:
         all_task_size_list = []
         task_size_mask_list = []
         mask_item = 0
-        # print("self.task_data_index_list", self.task_data_index_list)
         for idx, mobile_device in enumerate(mobile_device_list):
             if self.task_data_index_list[mobile_device_id] == idx:
                 mask_item = 1
@@ -74,20 +68,15 @@ class State:
                 mask_item = 0
             all_task_size_list.append(mobile_device_list[self.task_data_index_list.index(idx)].task.task_data_size)
             task_size_mask_list.append(mask_item)
-        # print("all_task_size_list:", all_task_size_list)
-        # print("task_size_mask_list:", task_size_mask_list)
         return all_task_size_list, task_size_mask_list
 
     def get_task_size(self, mobile_device_list, mobile_device_id):
         all_task_size_list = []
         task_size_mask_list = []
         mask_item = 0
-        # print("self.task_data_index_list", self.task_data_index_list)
         for idx, mobile_device in enumerate(mobile_device_list):
             if idx == mobile_device_id:
                 all_task_size_list.append(mobile_device_list[idx].task.task_data_size)
-        # print("all_task_size_list:", all_task_size_list)
-        # print("task_size_mask_list:", task_size_mask_list)
         return all_task_size_list
 
     def get_base_station_task_current_sum_process_time_list(self, base_station_list):
@@ -108,7 +97,7 @@ class State:
         self.all_task_size_list = self.get_task_size(self.mobile_device_list, self.mobile_device_id)
 
         self.base_station_task_current_sum_process_time_list = self.get_base_station_task_current_sum_process_time_list(
-            self.base_station_list)  # 这里记录的是当前MD观察到的所有BS的队列中的任务量状态
+            self.base_station_list)
 
         if self.global_config.train_config.is_testbed:
             self.transmitting_time_to_all_base_station_list = [
@@ -116,8 +105,6 @@ class State:
             state_list += self.transmitting_time_to_all_base_station_list
         else:
             state_list += [self.bandwidth] + [self.distance_to_base_station]
-        # self.last_base_station_offload_choice = self.mobile_device.last_base_station_offload_choice
-        # state_list.append(self.last_base_station_offload_choice)
         state_list += [self.energy_now]
         state_list += self.base_station_task_current_sum_process_time_list
 
@@ -125,7 +112,6 @@ class State:
 
     def get_normalized_state_array(self):
         state_array = self.get_state_array()
-        # print("state_array:\n", state_array)
         normalized_state_array = np.zeros_like(state_array)
 
         base_station_computing_ability_max = self.base_station_list[0].computing_ability_max
@@ -148,7 +134,6 @@ class State:
             normalized_state_array[5] = state_array[5] / self.global_config.base_station_set_config.mobile_device_config.distance_to_base_station_max
 
         normalized_state_array[6] = state_array[6] / self.energy_max
-        # TODO 暂时没有归一化各个BS的任务处理时间
         normalized_state_array[-1] = state_array[-1]
 
         if self.global_config.train_config.is_testbed:
@@ -159,8 +144,6 @@ class State:
             self.goals = [self.task_info.task_config.task_data_size_now / task_data_size_max,
                           self.task_info.task_config.task_date_size_std / 100,
                           normalized_state_array[0], normalized_state_array[4]]
-        # print("normalized_state_array:\n", normalized_state_array)
-        # exit()
         return normalized_state_array
 
     def get_state_array(self):
