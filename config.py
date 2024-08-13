@@ -13,15 +13,8 @@ class TrainConfig:
         self.gpu_index = 0
         self.tensorboard = True
         self.is_eval_mode = False
-        self.dynamic_update_a_b_episode_begin = 300e3
-        self.dynamic_update_a_b_episode_range = 1000
-        self.dynamic_update_a_b_fluctuate = 27
         self.is_save_json = False
 
-        self.if_save_buffer = False  # 是否存buffer用于画heatmap
-        # self.if_load_buffer = False
-        self.if_load_buffer = not self.if_save_buffer
-        self.load_buffer_name = 'bug'  # D+载入good  D-载入bad
         self.save_model_path = '/mnt/windisk/dataset_diffloader_mec/model/'
         self.save_buffer_npy_path = '/mnt/windisk/dataset_diffloader_mec/buffer/'
         self.if_generate_prompt = False

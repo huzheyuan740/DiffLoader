@@ -90,27 +90,15 @@ class BatchSampler:
         while (not all(dones)):  # if all done and queue is empty  # or (not self.queue.empty())
             # for reinforcement learning, the forward process requires no-gradient
             with torch.no_grad():
-                # convert observation to cuda
-                # compute policy on cuda
-                # convert action to cpu
                 observations, state_class_list, batch_ids = self.envs.create_mectask_per_step()
                 observations_tensor = torch.from_numpy(observations).to(device=device)
                 observations_tensor = observations_tensor.float()
-                # forward via policy network
-                # policy network will return Categorical(logits=logits)
-                # print("policy:", policy)
                 actions_tensor = policy(observations_tensor, params=params).sample()
                 actions = actions_tensor.cpu().numpy()
 
-            # print("self.envs.step:", self.envs.step)
             new_observations, rewards, dones, new_batch_ids, cost_array, offload_count = self.envs.step(state_class_list, actions, step_count)
-            # print("dones:", dones)
-            # if dones:
-            #     break
+
             step_count += 1
-            # here is observations NOT new_observations, batch_ids NOT new_batch_ids
-            # batch_ids = (0,)
-            # print("batch_ids:", batch_ids)
             episodes.append(observations, actions, rewards, batch_ids, cost_array)
             observations, batch_ids = new_observations, new_batch_ids
         print("step_count:", step_count)
@@ -125,11 +113,9 @@ class BatchSampler:
         return all(reset)
 
     def sample_tasks(self, num_tasks, global_config):
-        # tasks = self._env.unwrapped.sample_tasks(num_tasks)
         tasks = global_config.train_config.env_table
         return tasks
 
     def sample_eval_tasks(self, num_tasks, global_config):
-        # tasks = self._env.unwrapped.sample_tasks(num_tasks)
         tasks = global_config.train_config.test_env_parm_list
         return tasks

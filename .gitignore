@@ -54,6 +54,7 @@ logs/
 saves/
 maml-based_tensorboard/
 bert-base-uncased/
+sub-optimal.pdf
 
 
 # Distribution / packaging
