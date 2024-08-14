@@ -34,18 +34,24 @@ python scripts/diffloader_mec.py --model models.Tasksmeta --diffusion models.Gau
 To train SACLoader:
 
 ```bash
-python sac.py
+python sac_loader.py
 ```
 
 To train MoELoader:
 
 ```bash
-python pmoe.py
+python moe_loader.py
 ```
 
 To train MetaLoader:
 
 ```bash
-python maml_based_main.py --num-workers 1 --fast-lr 0.1 --max-kl 0.01 --fast-batch-size 1 --meta-batch-size 40 --num-layers 2 --hidden-size 100 --num-batches 10000 --gamma 0.99 --tau 1.0 --cg-damping 1e-5 --ls-max-steps 15 --output-folder maml-mec-dir --device cuda --env-name MEC-MetaLoader
+python meta_loader.py --num-workers 1 --fast-lr 0.1 --max-kl 0.01 --fast-batch-size 1 --meta-batch-size 40 --num-layers 2 --hidden-size 100 --num-batches 10000 --gamma 0.99 --tau 1.0 --cg-damping 1e-5 --ls-max-steps 15 --output-folder maml-mec-dir --device cuda --env-name MetaLoader
+```
+
+To train MTLoader:
+
+```bash
+python scripts/mt_loader.py --config mt_mec/mt_config/modular.json --id MTLoader
 ```
 

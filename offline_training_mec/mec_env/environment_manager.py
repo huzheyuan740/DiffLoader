@@ -280,3 +280,22 @@ class EnvironmentManager:
     def get_random_action(self, global_config):
         action = Action([1, 7 / 8], global_config)
         return action
+
+
+class EnvironmentManager_MT(EnvironmentManager):
+    def __init__(self, obs_type,
+            task_type,
+            random_init,
+            global_config: GlobalConfig):
+        super().__init__(global_config)
+
+        self.obs_type = obs_type
+        self.env_table = self.global_config.train_config.env_table
+        self.env_num = len(self.env_table)
+        # self.goal = np.array([0, 0, 0])
+        self.goal = np.zeros((self.env_num))
+        self.ue_num = self.global_config.base_station_set_config.mobile_device_num
+        self.observation_config = self.global_config.agent_config.state_config
+        self.action_config = self.global_config.agent_config.action_config
+        self.observation_space = self.observation_config.dimension * self.ue_num
+        self.action_space = self.action_config.dimension * self.ue_num
